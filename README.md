@@ -10,3 +10,11 @@ The most common algorithm for doing this is called the marching cubes algorithm.
 Update - Added the option to create smooth normals. 
 
 ![Marching Cubes](./Media/MarchingCubes3.png)
+
+
+------------------------------------------------------------------------------------------------------------------
+ I forked this repository to see how changing the density value could affect the shape of the terrain.
+ 
+ Stuff I looked at:
+ https://developer.nvidia.com/gpugems/gpugems3/part-i-geometry/chapter-1-generating-complex-procedural-terrains-using-gpu
+ https://github.com/Scrawk/Marching-Cubes (obviously)
