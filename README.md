@@ -21,3 +21,13 @@ Update - Added the option to create smooth normals.
  https://github.com/Scrawk/Marching-Cubes (obviously)
  
  https://www.redblobgames.com/maps/terrain-from-noise/
+ 
+ 
+ https://github.com/SebLague/Procedural-Landmass-Generation
+ 
+ https://www.youtube.com/playlist?list=PLFt_AvWsXl0eBW2EiBtl_sxmDtSgZBxB3
+ 
+ 
+ https://github.com/SebLague/Marching-Cubes
+ 
+ https://www.youtube.com/watch?v=M3iI2l0ltbE
