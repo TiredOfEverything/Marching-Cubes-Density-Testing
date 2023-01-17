@@ -7,20 +7,20 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class GPUGemsTerrain : MonoBehaviour {
-    public enum NoiseType { Perlin, Voronoi, Simplex, Value, Worley }
+    public enum NoiseType { Perlin, Perlin2D, Voronoi, Simplex, Value, Worley }
 
     [Range (8, 64)] public int resolution = 32;
     public Vector3Int size = Vector3Int.one;
     public Material material;
     public MARCHING_MODE mode = MARCHING_MODE.CUBES;
     public float baseHeight, hardFloor = -13, hardFloor2 = 3, hardFloor3 = 40, lacunarity = 2.0f, persistence = 0.5f;
-    public float redistribution = 1f;
     public List<Octave> octaves;
     [System.Serializable]
     public class Octave {
         public int seed = 0;
         public NoiseType noiseType;
         public float frequency = 1, amplitude = 1, terrace = 0.5f;
+        public float redistribution = 1f;
         public FractalNoise fractal;
     }
     public bool smoothNormals = false;
@@ -103,7 +103,8 @@ public class GPUGemsTerrain : MonoBehaviour {
             densityFractal = octaves[i].fractal;
             float frequency = octaves[i].frequency * Mathf.Pow (lacunarity, i);
             float amplitude = octaves[i].amplitude * Mathf.Pow (persistence, i);
-            density += Mathf.Round ((densityFractal.Sample3D (ws * frequency) * amplitude) * octaves[i].terrace) / octaves[i].terrace;
+            float noiseSample = octaves[i].noiseType == NoiseType.Perlin2D ? Mathf.PerlinNoise(ws.x * frequency, ws.z * frequency): densityFractal.Sample3D (ws * frequency);
+            density += Mathf.Round (math.pow ((noiseSample * amplitude), octaves[i].redistribution) * octaves[i].terrace) / octaves[i].terrace;
         }
         float hard_floor_y = hardFloor;
         density += math.saturate ((hard_floor_y - ws.y) * hardFloor2) * hardFloor3;
