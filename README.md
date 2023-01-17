@@ -17,4 +17,7 @@ Update - Added the option to create smooth normals.
  
  Stuff I looked at:
  https://developer.nvidia.com/gpugems/gpugems3/part-i-geometry/chapter-1-generating-complex-procedural-terrains-using-gpu
+ 
  https://github.com/Scrawk/Marching-Cubes (obviously)
+ 
+ https://www.redblobgames.com/maps/terrain-from-noise/
