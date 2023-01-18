@@ -7,7 +7,19 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 public class GPUGemsTerrain : MonoBehaviour {
-    public enum NoiseType { Perlin, Perlin2D, Voronoi, Simplex, Value, Worley }
+    public enum NoiseType {
+        Perlin2D,
+        Perlin2DUnity,
+        Voronoi2D,
+        Simplex2D,
+        Value2D,
+        Worley2D,
+        Perlin3D,
+        Voronoi3D,
+        Simplex3D,
+        Value3D,
+        Worley3D
+    }
 
     [Range (8, 64)] public int resolution = 32;
     public Vector3Int size = Vector3Int.one;
@@ -22,6 +34,7 @@ public class GPUGemsTerrain : MonoBehaviour {
         public float frequency = 1, amplitude = 1, terrace = 0.5f;
         public float redistribution = 1f;
         public FractalNoise fractal;
+        public bool twoDee { get; set; }
     }
     public bool smoothNormals = false;
     public bool drawNormals = false;
@@ -35,7 +48,7 @@ public class GPUGemsTerrain : MonoBehaviour {
     }
     public void GenerateMesh () {
         foreach (var o in octaves) {
-            INoise selectedInoise = GenerateNewNoise (o.noiseType, o.seed);
+            INoise selectedInoise = GenerateNewNoise (o);
             o.fractal = new FractalNoise (selectedInoise, 1, 1.0f);
         }
         //Set the mode used to create the mesh.
@@ -103,35 +116,61 @@ public class GPUGemsTerrain : MonoBehaviour {
             densityFractal = octaves[i].fractal;
             float frequency = octaves[i].frequency * Mathf.Pow (lacunarity, i);
             float amplitude = octaves[i].amplitude * Mathf.Pow (persistence, i);
-            float noiseSample = octaves[i].noiseType == NoiseType.Perlin2D ? Mathf.PerlinNoise(ws.x * frequency, ws.z * frequency): densityFractal.Sample3D (ws * frequency);
+            float noiseSample = octaves[i].noiseType == NoiseType.Perlin2DUnity ? Mathf.PerlinNoise (ws.x * frequency, ws.z * frequency) : (octaves[i].twoDee? densityFractal.Sample2D (ws.x * frequency, ws.z * frequency) : densityFractal.Sample3D (ws * frequency));
             density += Mathf.Round (math.pow ((noiseSample * amplitude), octaves[i].redistribution) * octaves[i].terrace) / octaves[i].terrace;
         }
         float hard_floor_y = hardFloor;
         density += math.saturate ((hard_floor_y - ws.y) * hardFloor2) * hardFloor3;
         return density;
     }
-    public INoise GenerateNewNoise (NoiseType noiseType, int seed) {
+    public INoise GenerateNewNoise (Octave octave) {
+        octave.twoDee = false;
         INoise selectedInoise = null;
-        switch (noiseType) {
-            case NoiseType.Perlin:
-                INoise perlin = new PerlinNoise (seed, 1.0f);
-                selectedInoise = perlin;
+        switch (octave.noiseType) {
+            case NoiseType.Perlin2D:
+                INoise perlin2D = new PerlinNoise (octave.seed, 1.0f);
+                selectedInoise = perlin2D;
+                octave.twoDee = true;
                 break;
-            case NoiseType.Voronoi:
-                INoise voronoi = new VoronoiNoise (seed, 1.0f);
-                selectedInoise = voronoi;
+            case NoiseType.Perlin3D:
+                INoise perlin3D = new PerlinNoise (octave.seed, 1.0f);
+                selectedInoise = perlin3D;
                 break;
-            case NoiseType.Simplex:
-                INoise simplex = new SimplexNoise (seed, 1.0f);
-                selectedInoise = simplex;
+            case NoiseType.Voronoi2D:
+                INoise voronoi2D = new VoronoiNoise (octave.seed, 1.0f);
+                selectedInoise = voronoi2D;
+                octave.twoDee = true;
                 break;
-            case NoiseType.Value:
-                INoise value = new ValueNoise (seed, 1.0f);
-                selectedInoise = value;
+            case NoiseType.Voronoi3D:
+                INoise voronoi3D = new VoronoiNoise (octave.seed, 1.0f);
+                selectedInoise = voronoi3D;
                 break;
-            case NoiseType.Worley:
-                INoise worley = new WorleyNoise (seed, 1.0f, 0, 1);
-                selectedInoise = worley;
+            case NoiseType.Simplex2D:
+                INoise simplex2D = new SimplexNoise (octave.seed, 1.0f);
+                selectedInoise = simplex2D;
+                octave.twoDee = true;
+                break;
+            case NoiseType.Simplex3D:
+                INoise simplex3D = new SimplexNoise (octave.seed, 1.0f);
+                selectedInoise = simplex3D;
+                break;
+            case NoiseType.Value2D:
+                INoise value2D = new ValueNoise (octave.seed, 1.0f);
+                selectedInoise = value2D;
+                octave.twoDee = true;
+                break;
+            case NoiseType.Value3D:
+                INoise value3D = new ValueNoise (octave.seed, 1.0f);
+                selectedInoise = value3D;
+                break;
+            case NoiseType.Worley2D:
+                INoise worley2D = new WorleyNoise (octave.seed, 1.0f, 0, 1);
+                selectedInoise = worley2D;
+                octave.twoDee = true;
+                break;
+            case NoiseType.Worley3D:
+                INoise worley3D = new WorleyNoise (octave.seed, 1.0f, 0, 1);
+                selectedInoise = worley3D;
                 break;
         }
         return selectedInoise;
