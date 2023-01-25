@@ -29,6 +29,7 @@ public class GPUGemsTerrain : MonoBehaviour {
     public List<Octave> octaves;
     [System.Serializable]
     public class Octave {
+        public bool enabled = true;
         public int seed = 0;
         public NoiseType noiseType;
         public float frequency = 1, amplitude = 1, terrace = 0.5f;
@@ -113,6 +114,9 @@ public class GPUGemsTerrain : MonoBehaviour {
         ws += new float3 (offset);
         float density = -ws.y;
         for (int i = 0; i < octaves.Count; i++) {
+            if (!octaves[i].enabled) {
+                continue;
+            }
             densityFractal = octaves[i].fractal;
             float frequency = octaves[i].frequency * Mathf.Pow (lacunarity, i);
             float amplitude = octaves[i].amplitude * Mathf.Pow (persistence, i);
